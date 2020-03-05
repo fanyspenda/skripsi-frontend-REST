@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { Menu, Dropdown } from "semantic-ui-react";
+import React from "react";
+import { Menu, Dropdown, Segment } from "semantic-ui-react";
 import { Router, Link, Route } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import AddAlumni from "./pages/addAlumni";
+import ListAlumni from "./pages/listAlumni";
+import DetailAlumni from "./pages/detailAlumni";
 
-const App = () => {
+const App: React.FunctionComponent<{}> = () => {
   const history = createBrowserHistory();
-  const [activeMenu, setActiveMenu] = useState("A");
   return (
     <Router history={history}>
       <Menu inverted color="blue" attached>
@@ -16,11 +17,17 @@ const App = () => {
             <Dropdown.Item as={Link} to="/addAlumni">
               Tambah Alumni
             </Dropdown.Item>
-            <Dropdown.Item>Lihat Daftar Alumni</Dropdown.Item>
+            <Dropdown.Item as={Link} to="/listAlumni">
+              Lihat Daftar Alumni
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </Menu>
-      <Route exact path="/addAlumni" component={AddAlumni} />
+      <Segment basic>
+        <Route exact path="/addAlumni" component={AddAlumni} />
+        <Route exact path="/listAlumni" component={ListAlumni} />
+        <Route exact path="/detailAlumni" component={DetailAlumni} />
+      </Segment>
     </Router>
   );
 };
