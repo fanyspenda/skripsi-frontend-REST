@@ -5,6 +5,7 @@ import { createBrowserHistory } from "history";
 import AddAlumni from "./pages/addAlumni";
 import ListAlumni from "./pages/listAlumni";
 import DetailAlumni from "./pages/detailAlumni";
+import EditAlumni from "./pages/editAlumni";
 
 const App: React.FunctionComponent<{}> = () => {
   const history = createBrowserHistory();
@@ -27,6 +28,7 @@ const App: React.FunctionComponent<{}> = () => {
         <Route exact path="/addAlumni" component={AddAlumni} />
         <Route exact path="/listAlumni" component={ListAlumni} />
         <Route exact path="/detailAlumni" component={DetailAlumni} />
+        <Route exact path="/editAlumni" component={EditAlumni} />
       </Segment>
     </Router>
   );

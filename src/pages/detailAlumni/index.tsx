@@ -10,7 +10,7 @@ interface DetailAlumniInterface extends alumniInterface {
 }
 
 const DetailAlumni: React.FunctionComponent<RouteComponentProps> = () => {
-  const location: any = useLocation();
+  const location = useLocation();
   const alumniId = location.state;
   const [alumni, setAlumni] = useState<DetailAlumniInterface>({
     _id: "",
