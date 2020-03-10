@@ -9,9 +9,14 @@ interface DetailAlumniInterface extends alumniInterface {
   _id: string;
 }
 
+interface AlumniIdSource {
+  _id: string;
+  data_source: string;
+}
+
 const DetailAlumni: React.FunctionComponent<RouteComponentProps> = () => {
-  const location = useLocation();
-  const alumniId = location.state;
+  const location = useLocation<AlumniIdSource>().state;
+
   const [alumni, setAlumni] = useState<DetailAlumniInterface>({
     _id: "",
     name: "",
@@ -25,16 +30,39 @@ const DetailAlumni: React.FunctionComponent<RouteComponentProps> = () => {
   });
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:4000/alumni/${alumniId}`)
-      .then(res => {
-        const alumniData = res.data;
-        setAlumni(alumniData);
-        console.log("updated");
-      })
-      .catch(err => {
-        alert(err);
-      });
+    const alumniId = location._id;
+    const alumniSource = location.data_source;
+    if (alumniSource === "manual") {
+      axios
+        .get(`http://localhost:4000/alumni/${alumniId}`)
+        .then(res => {
+          const alumniData = res.data;
+          setAlumni(alumniData);
+        })
+        .catch(err => {
+          alert(err);
+        });
+    } else if (alumniSource === "facebook") {
+      axios
+        .get(`http://localhost:4000/alumniFacebook/${alumniId}`)
+        .then(res => {
+          const alumniData = res.data;
+          setAlumni(alumniData);
+        })
+        .catch(err => {
+          alert(err);
+        });
+    } else if (alumniSource === "linkedin") {
+      axios
+        .get(`http://localhost:4000/alumniLinkedin/${alumniId}`)
+        .then(res => {
+          const alumniData = res.data;
+          setAlumni(alumniData);
+        })
+        .catch(err => {
+          alert(err);
+        });
+    }
   }, []);
 
   const isWorkEmpty = (work_at: string, work_position: string) => {
