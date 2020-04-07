@@ -1,87 +1,110 @@
 import React, { useState, useEffect } from "react";
-import { Card, Grid } from "semantic-ui-react";
+import { Card, Grid, Button } from "semantic-ui-react";
 import axios from "axios";
-import { useHistory } from "react-router";
-import EditDeleteButton from "../../components/EditDeleteButton";
+import AlumniCard from "./alumniCard";
 
 interface alumniListInterface {
-  _id: string;
-  name: string;
-  work_at: string;
-  work_position: string;
-  email: string;
-  data_source: string;
+	_id: string;
+	name: string;
+	work_at: string;
+	work_position: string;
+	email: string;
+	data_source: string;
 }
 
 const ListAlumni: React.FunctionComponent<{}> = () => {
-  const history = useHistory();
+	const [alumniPage, setAlumniPage] = useState(1);
+	const [alumniLinkedinPage, setAlumniLinkedinPage] = useState(1);
+	const [alumnis, setAlumnis] = useState<alumniListInterface[]>([
+		{
+			_id: "",
+			name: "",
+			work_at: "",
+			work_position: "",
+			email: "",
+			data_source: "",
+		},
+	]);
 
-  const [alumnis, setAlumnis] = useState<alumniListInterface[]>([
-    {
-      _id: "",
-      name: "",
-      work_at: "",
-      work_position: "",
-      email: "",
-      data_source: ""
-    }
-  ]);
+	const [alumniLinkedin, setAlumniLinkedin] = useState<alumniListInterface[]>(
+		[
+			{
+				_id: "",
+				name: "",
+				work_at: "",
+				work_position: "",
+				email: "",
+				data_source: "",
+			},
+		]
+	);
 
-  const handleCardClick = (_id: string, data_source: string) => {
-    const data = {
-      _id,
-      data_source
-    };
-    history.push("/detailAlumni", data);
-  };
+	const handleLinkedinScrap = () => {
+		axios
+			.get("http://localhost:5000/scraper")
+			.then((res) => {
+				alert("Selesai Men-scrape data dari linkedIn!");
+			})
+			.catch((err) => {
+				alert(`terjadi kesalahan dalam scraper: ${err}`);
+			});
+	};
 
-  const handleEditClick = (_id: string) => {
-    history.push("/editAlumni", _id);
-  };
+	useEffect(() => {
+		axios
+			.get("http://localhost:4000/alumni?page=1&limit=40")
+			.then((res1) => {
+				console.log(res1.data);
 
-  const handleDeleteClick = (_id: string) => {
-    console.log(`delete alumni with id ${_id}`);
-  };
+				setAlumnis(res1.data.data);
+			})
+			.catch((err) => {
+				alert("gagal mengambil data dari input manual alumni!");
+				console.log(err);
+			});
+		axios
+			.get("http://localhost:4000/alumnilinkedin?page=1&limit=40")
+			.then((res2) => {
+				setAlumniLinkedin(res2.data.data);
+			})
+			.catch((err) => {
+				alert("gagal mengambil data alumni linkedin!");
+				console.log(err);
+			});
+	}, []);
 
-  useEffect(() => {
-    axios.get("http://localhost:4000/alumni").then(res1 => {
-      let alumniData = res1.data;
-      axios.get("http://localhost:4000/alumniFacebook").then(res2 => {
-        alumniData.push(...res2.data);
-        axios.get("http://localhost:4000/alumniLinkedin").then(res3 => {
-          alumniData.push(...res3.data);
-          setAlumnis(alumniData);
-        });
-      });
-    });
-  }, []);
-
-  return (
-    <Grid columns={4} stackable>
-      {alumnis.map((alumni, index) => (
-        <Grid.Column key={alumni._id}>
-          <Card centered link>
-            <Card.Content
-              onClick={() => handleCardClick(alumni._id, alumni.data_source)}
-            >
-              <Card.Header>{alumni.name}</Card.Header>
-              <Card.Meta>{alumni.work_at}</Card.Meta>
-              <Card.Description>{`${alumni.work_position}`}</Card.Description>
-              <Card.Description>{`${alumni.email}`}</Card.Description>
-            </Card.Content>
-            <Card.Content extra>
-              {alumni.data_source == "manual" ? (
-                <EditDeleteButton
-                  onEditClick={() => handleEditClick(alumni._id)}
-                  onDeleteClick={() => handleDeleteClick(alumni._id)}
-                />
-              ) : null}
-            </Card.Content>
-          </Card>
-        </Grid.Column>
-      ))}
-    </Grid>
-  );
+	return (
+		<>
+			<h1>Data Input Manual</h1>
+			<Grid columns={4} stackable>
+				{alumnis.map((alumni, index) => (
+					<Grid.Column key={alumni._id}>
+						<AlumniCard alumni={alumni} />
+					</Grid.Column>
+				))}
+			</Grid>
+			<br />
+			<br />
+			<br />
+			<Grid columns={4} stackable>
+				<Grid.Row>
+					<Grid.Column width={8} textAlign="left">
+						<h1>Data Linkedin</h1>
+					</Grid.Column>
+					<Grid.Column width={8} textAlign="right">
+						<Button onClick={() => handleLinkedinScrap()}>
+							Scrap From LinkedIn
+						</Button>
+					</Grid.Column>
+				</Grid.Row>
+				{alumniLinkedin.map((alumni, index) => (
+					<Grid.Column key={alumni._id}>
+						<AlumniCard alumni={alumni} />
+					</Grid.Column>
+				))}
+			</Grid>
+		</>
+	);
 };
 
 export default ListAlumni;
