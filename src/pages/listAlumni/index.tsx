@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Grid, Button } from "semantic-ui-react";
+import { Card, Grid, Button, Label } from "semantic-ui-react";
 import axios from "axios";
 import AlumniCard from "./alumniCard";
 import { page } from "interfaces/pageInterface";
@@ -15,25 +15,12 @@ interface alumniListInterface {
 
 const ListAlumni: React.FunctionComponent<{}> = () => {
 	const [currentPageLinkedin, setCurrentPageLinkedin] = useState(1);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [alumniPage, setAlumniPage] = useState(1);
 	const [alumniLinkedinPage, setAlumniLinkedinPage] = useState<page[]>([
 		{
 			number: 1,
 			url: "",
 		},
 	]);
-	const [alumnis, setAlumnis] = useState<alumniListInterface[]>([
-		{
-			_id: "",
-			name: "",
-			work_at: "",
-			work_position: "",
-			email: "",
-			data_source: "",
-		},
-	]);
-
 	const [alumniLinkedin, setAlumniLinkedin] = useState<alumniListInterface[]>(
 		[
 			{
@@ -46,6 +33,18 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 			},
 		]
 	);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [alumniPage, setAlumniPage] = useState(1);
+	const [alumnis, setAlumnis] = useState<alumniListInterface[]>([
+		{
+			_id: "",
+			name: "",
+			work_at: "",
+			work_position: "",
+			email: "",
+			data_source: "",
+		},
+	]);
 
 	const handleLinkedinScrap = () => {
 		axios
@@ -60,7 +59,11 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 
 	const handlePageClick = (pageNumber: number, url: string) => {
 		axios
-			.get(`http://localhost:4000${url}`)
+			.get(`http://localhost:4000${url}`, {
+				headers: {
+					authorization: "bearer " + localStorage.getItem("token"),
+				},
+			})
 			.then((res) => {
 				setAlumniLinkedin(res.data.data);
 				setAlumniLinkedinPage(res.data.pages);
@@ -73,7 +76,11 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 
 	useEffect(() => {
 		axios
-			.get("http://localhost:4000/alumni?page=1&limit=40")
+			.get("http://localhost:4000/alumni?page=1&limit=40", {
+				headers: {
+					authorization: "bearer " + localStorage.getItem("token"),
+				},
+			})
 			.then((res1) => {
 				console.log(res1.data);
 				setAlumnis(res1.data.data);
@@ -83,7 +90,11 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 				console.log(err);
 			});
 		axios
-			.get("http://localhost:4000/alumnilinkedin?page=1&limit=40")
+			.get("http://localhost:4000/alumnilinkedin?page=1&limit=40", {
+				headers: {
+					authorization: "bearer " + localStorage.getItem("token"),
+				},
+			})
 			.then((res2) => {
 				setAlumniLinkedin(res2.data.data);
 				setAlumniLinkedinPage(res2.data.pages);
@@ -130,7 +141,9 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 					<Grid.Column width={16} textAlign="center">
 						{alumniLinkedinPage.map((page, index) =>
 							page.number === currentPageLinkedin ? (
-								<Button color="grey">{page.number}</Button>
+								<Label color="grey" size="large">
+									{page.number}
+								</Label>
 							) : (
 								<Button
 									color="instagram"
