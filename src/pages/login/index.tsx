@@ -23,7 +23,7 @@ const Login: React.FunctionComponent = () => {
 				.then((res) => {
 					alert("login berhasil!");
 					dispatch({ type: "SAVE_TOKEN", token: res.data.token });
-					history.push("/listAlumni");
+					history.push("/alumni");
 					// dispatch({ type: "REMOVE_TOKEN", token: "" });
 				})
 				.catch((err) => {

@@ -1,4 +1,4 @@
 export interface page {
-	number: number;
+	page: number;
 	url: string;
 }

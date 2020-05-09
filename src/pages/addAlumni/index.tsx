@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useFormik } from "formik";
 import { Segment, Button } from "semantic-ui-react";
 import axios from "axios";
@@ -8,6 +8,7 @@ import alumniInterface from "../../interfaces/alumniInterface";
 import { useHistory } from "react-router";
 import majors from "./majorGetter";
 import alumniSchema from "./addAlumniValidation";
+import { TokenContext } from "contexts/tokenContext";
 interface inputAlumni extends alumniInterface {
 	data_source: string;
 }
@@ -24,17 +25,22 @@ const alumni: inputAlumni = {
 };
 
 const AddAlumni: React.FunctionComponent = () => {
-	const [isDisabled, setIsDisabled] = useState(false);
 	const history = useHistory();
+	const { token } = useContext(TokenContext);
+	const [isDisabled, setIsDisabled] = useState(false);
 	const formik = useFormik({
 		initialValues: alumni,
 		onSubmit: (values) => {
 			setIsDisabled(true);
 			axios
-				.post("http://localhost:4000/alumni", values)
+				.post("http://localhost:4000/alumni", values, {
+					headers: {
+						authorization: `bearer ${token}`,
+					},
+				})
 				.then((res) => {
 					alert("Berhasil menyimpan data! \n" + res.data);
-					history.push("/listAlumni");
+					history.push("/alumni");
 				})
 				.catch((err) => alert(`Error inputing data: ${err}`))
 				.finally(() => {

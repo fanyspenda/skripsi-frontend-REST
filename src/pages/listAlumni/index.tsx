@@ -17,7 +17,7 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 	const [currentPageLinkedin, setCurrentPageLinkedin] = useState(1);
 	const [alumniLinkedinPage, setAlumniLinkedinPage] = useState<page[]>([
 		{
-			number: 1,
+			page: 1,
 			url: "",
 		},
 	]);
@@ -140,18 +140,18 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 				<Grid.Row>
 					<Grid.Column width={16} textAlign="center">
 						{alumniLinkedinPage.map((page, index) =>
-							page.number === currentPageLinkedin ? (
+							page.page === currentPageLinkedin ? (
 								<Label color="grey" size="large">
-									{page.number}
+									{page.page}
 								</Label>
 							) : (
 								<Button
 									color="instagram"
 									onClick={() =>
-										handlePageClick(page.number, page.url)
+										handlePageClick(page.page, page.url)
 									}
 								>
-									{page.number}
+									{page.page}
 								</Button>
 							)
 						)}
