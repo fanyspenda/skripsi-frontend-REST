@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useFormik } from "formik";
 import { Segment, Button } from "semantic-ui-react";
 import axios from "axios";
@@ -6,10 +6,10 @@ import CustomInputForm from "../../components/CustomInputForm";
 import CustomDropdownForm from "../../components/CustomDropdownForm";
 import alumniInterface from "../../interfaces/alumniInterface";
 import { useHistory } from "react-router";
-import majors from "./majorGetter";
 import alumniSchema from "./addAlumniValidation";
 import { TokenContext } from "contexts/tokenContext";
 import useAuth from "hooks/useAuth";
+import { major } from "interfaces/majorInterface";
 interface inputAlumni extends alumniInterface {
 	data_source: string;
 }
@@ -25,10 +25,37 @@ const alumni: inputAlumni = {
 	data_source: "manual",
 };
 
+interface majorDropdown {
+	text: string;
+	value: string;
+}
+
 const AddAlumni: React.FunctionComponent = () => {
 	const history = useHistory();
 	const { isLevelMatch, level, token } = useAuth();
 	const [isDisabled, setIsDisabled] = useState(false);
+	const [majors, setMajor] = useState<majorDropdown[]>([
+		{ text: "", value: "" },
+	]);
+	const getMajors = () => {
+		axios
+			.get("http://localhost:4000/major?page=1&limit=0", {
+				headers: {
+					authorization: `bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				let majorsArray: majorDropdown[] = [];
+				res.data.data.map((values: major, index: number) => {
+					majorsArray.push({ text: values.name, value: values.name });
+				});
+				setMajor(majorsArray);
+			});
+	};
+
+	useEffect(() => {
+		getMajors();
+	}, []);
 	const formik = useFormik({
 		initialValues: alumni,
 		onSubmit: (values) => {
