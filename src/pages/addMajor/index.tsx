@@ -5,6 +5,8 @@ import CustomInputForm from "components/CustomInputForm";
 import { addMajorValidationScehma } from "./addMajorValidation";
 import { TokenContext } from "contexts/tokenContext";
 import { useHistory } from "react-router-dom";
+import useAuth from "hooks/useAuth";
+import axios from "axios";
 
 const initialValues = {
 	degree: "",
@@ -13,18 +15,33 @@ const initialValues = {
 
 const AddMajor: React.FunctionComponent = () => {
 	const history = useHistory();
-	const { token } = useContext(TokenContext);
+	const { token, level, isLevelMatch } = useAuth();
 
+	const addMajor = (data: any) => {
+		axios
+			.post("http://localhost:4000/major", data, {
+				headers: {
+					authorization: `bearer ${token}`,
+				},
+			})
+			.then(() => {
+				history.push("/majors");
+			})
+			.catch((error) => {
+				alert(error);
+			});
+	};
 	const formik = useFormik({
 		initialValues,
 		onSubmit: (values) => {
-			console.log(values);
+			addMajor(`${values.degree} ${values.name}`);
 		},
 		validationSchema: addMajorValidationScehma,
 	});
 
 	return (
 		<Segment basic>
+			{isLevelMatch(level, 0)}
 			<h1>Tambah Jurusan</h1>
 			<Form onSubmit={formik.handleSubmit}>
 				<Form.Group inline>
@@ -76,7 +93,9 @@ const AddMajor: React.FunctionComponent = () => {
 					onChange={formik.handleChange}
 					value={formik.values.name}
 				/>
-				<Button type="submit">Tambah Jurusan</Button>
+				<Button type="submit" color="blue">
+					Tambah Jurusan
+				</Button>
 			</Form>
 		</Segment>
 	);

@@ -2,14 +2,19 @@ import React, { useContext, useState, useEffect } from "react";
 import { Segment, Grid, Table, Tab, Label, Button } from "semantic-ui-react";
 import { TokenContext } from "contexts/tokenContext";
 import { major } from "interfaces/majorInterface";
+import { page } from "interfaces/pageInterface";
 import { useHistory, useLocation } from "react-router-dom";
 import axios from "axios";
+import CustomPagination from "components/CustomPagination";
+import useAuth from "hooks/useAuth";
+import UseLoading from "hooks/useLoading";
 
 const MajorPage: React.FunctionComponent = () => {
 	const location: any = useLocation();
 	const previousPage = location.state?.page as number;
 	const history = useHistory();
-	const { token } = useContext(TokenContext);
+	const { token, level } = useAuth();
+	const { isLoading, setLoadingToTrue, setLoadingToFalse } = UseLoading();
 	const [currentPage, setCurrentPage] = useState(previousPage || 1);
 	const [majors, setMajors] = useState<major[]>([
 		{
@@ -19,7 +24,9 @@ const MajorPage: React.FunctionComponent = () => {
 	]);
 	const [totalData, setTotalData] = useState(0);
 	const [totalPage, setTotalPage] = useState(0);
+	const [pages, setPages] = useState<page[]>([{ number: 1, url: "" }]);
 	const getMajorData = (page: number, limit: number) => {
+		setLoadingToTrue();
 		axios
 			.get(`http://localhost:4000/major?limit=${limit}&page=${page}`, {
 				headers: {
@@ -30,17 +37,42 @@ const MajorPage: React.FunctionComponent = () => {
 				setMajors(res.data.data);
 				setTotalData(res.data.totalMajor);
 				setTotalPage(res.data.pageCount);
+				setPages(res.data.pages);
 			})
 			.catch((err) => {
 				return <Label color="red">{err}</Label>;
-			});
+			})
+			.finally(() => setLoadingToFalse());
+	};
+	const deleteMajor = (id: string) => {
+		setLoadingToTrue();
+		axios
+			.delete(`http://localhost:4000/major/${id}`, {
+				headers: {
+					authorization: `bearer ${token}`,
+				},
+			})
+			.then(() => {
+				history.replace("/majors", currentPage);
+				window.location.reload(true);
+			})
+			.catch((err) => alert(err))
+			.finally(() => setLoadingToFalse());
+	};
+
+	const handlePageClick = (pageClicked: number) => {
+		setCurrentPage(pageClicked);
+		getMajorData(pageClicked, 20);
+	};
+	const handleDeleteClick = (id: string) => {
+		deleteMajor(id);
 	};
 	useEffect(() => {
-		getMajorData(currentPage, 40);
-	});
+		getMajorData(currentPage, 20);
+	}, []);
 
 	return (
-		<Segment basic>
+		<Segment basic disabled={isLoading}>
 			<h1>Jurusan Terdaftar</h1>
 			<Label color="olive">jumlah jurusan: {totalData}</Label>
 			<Label color="olive">jumlah halaman: {totalPage}</Label>
@@ -50,60 +82,67 @@ const MajorPage: React.FunctionComponent = () => {
 						<Table.HeaderCell
 							rowSpan="2"
 							textAlign="center"
-							width="11"
+							width={level == 0 ? 11 : 16}
 						>
 							<h4>Nama Jurusan</h4>
 						</Table.HeaderCell>
-						<Table.HeaderCell
-							colSpan="2"
-							textAlign="center"
-							width="4"
-						/>
+						{level == 0 && (
+							<Table.HeaderCell
+								colSpan="2"
+								textAlign="center"
+								width="4"
+							/>
+						)}
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
 					{majors.map((major: major, index: number) => (
-						<Table.Row>
-							<Table.Cell width="11">{major.name}</Table.Cell>
-							<Table.Cell width="2">
-								<Button
-									color="yellow"
-									basic
-									fluid
-									onClick={() =>
-										history.push("/editMajor", major._id)
-									}
-								>
-									EDIT
-								</Button>
+						<Table.Row warning={isLoading}>
+							<Table.Cell width={level == 0 ? 11 : 16}>
+								{major.name}
 							</Table.Cell>
-							<Table.Cell width="2">
-								<Button
-									color="red"
-									basic
-									fluid
-									// onClick={() =>
-									// 	deleteMajor({
-									// 		variables: {
-									// 			id: major._id,
-									// 		},
-									// 	})
-									// }
-								>
-									HAPUS
-								</Button>
-							</Table.Cell>
+							{level == 0 && (
+								<>
+									<Table.Cell width="2">
+										<Button
+											color="yellow"
+											basic
+											fluid
+											onClick={() =>
+												history.push(
+													"/editMajor",
+													major._id
+												)
+											}
+										>
+											EDIT
+										</Button>
+									</Table.Cell>
+									<Table.Cell width="2">
+										<Button
+											color="red"
+											basic
+											fluid
+											onClick={() =>
+												handleDeleteClick(major._id)
+											}
+										>
+											HAPUS
+										</Button>
+									</Table.Cell>
+								</>
+							)}
 						</Table.Row>
 					))}
 				</Table.Body>
 			</Table>
-			{/* <Segment basic textAlign="center">
+			<Segment basic textAlign="center">
 				<CustomPagination
 					currentPage={currentPage}
-					handlePageClick={setCurrentPage}
+					handlePageClick={handlePageClick}
 					data={pages}
 				/>
-			</Segment> */}
+			</Segment>
 		</Segment>
 	);
 };

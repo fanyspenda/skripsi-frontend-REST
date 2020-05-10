@@ -9,6 +9,7 @@ import { useHistory } from "react-router";
 import majors from "./majorGetter";
 import alumniSchema from "./addAlumniValidation";
 import { TokenContext } from "contexts/tokenContext";
+import useAuth from "hooks/useAuth";
 interface inputAlumni extends alumniInterface {
 	data_source: string;
 }
@@ -26,7 +27,7 @@ const alumni: inputAlumni = {
 
 const AddAlumni: React.FunctionComponent = () => {
 	const history = useHistory();
-	const { token } = useContext(TokenContext);
+	const { isLevelMatch, level, token } = useAuth();
 	const [isDisabled, setIsDisabled] = useState(false);
 	const formik = useFormik({
 		initialValues: alumni,
@@ -52,6 +53,7 @@ const AddAlumni: React.FunctionComponent = () => {
 
 	return (
 		<Segment basic>
+			{isLevelMatch(level, 0)}
 			<h1>Tambah data Alumni</h1>
 			<form onSubmit={formik.handleSubmit}>
 				<CustomInputForm

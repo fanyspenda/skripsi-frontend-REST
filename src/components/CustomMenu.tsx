@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { TokenContext } from "contexts/tokenContext";
 import jwtDecoder from "jwt-decode";
 import { decodedToken } from "interfaces/tokenInterface";
+import useAuth from "hooks/useAuth";
 
 interface customMenuProps {
 	token: string | undefined;
@@ -11,17 +12,17 @@ interface customMenuProps {
 
 const CustomMenu: React.FunctionComponent<customMenuProps> = ({ token }) => {
 	const { dispatch } = useContext(TokenContext);
+	const { level, name } = useAuth();
 	const handleLogoutClick = () => {
 		localStorage.removeItem("token");
 		dispatch({ type: "REMOVE_TOKEN", token: "" });
 	};
 	if (token) {
-		const decodedToken: decodedToken = jwtDecoder(token || "");
 		return (
 			<>
 				<Dropdown item text="Alumni">
 					<Dropdown.Menu>
-						{decodedToken?.level == 0 ? (
+						{level == 0 ? (
 							<Dropdown.Item as={Link} to="/addAlumni">
 								Tambah Alumni
 							</Dropdown.Item>
@@ -33,7 +34,7 @@ const CustomMenu: React.FunctionComponent<customMenuProps> = ({ token }) => {
 				</Dropdown>
 				<Dropdown item text="Jurusan">
 					<Dropdown.Menu>
-						{decodedToken?.level == 0 ? (
+						{level == 0 ? (
 							<Dropdown.Item as={Link} to="/addMajor">
 								Tambah Jurusan
 							</Dropdown.Item>
@@ -44,13 +45,17 @@ const CustomMenu: React.FunctionComponent<customMenuProps> = ({ token }) => {
 					</Dropdown.Menu>
 				</Dropdown>
 				<Menu.Menu position="right">
-					<Menu.Item
-						as={Link}
-						to="/login"
-						onClick={() => handleLogoutClick()}
-					>
-						Keluar
-					</Menu.Item>
+					<Dropdown item text={name}>
+						<Dropdown.Menu>
+							<Dropdown.Item
+								as={Link}
+								to="/login"
+								onClick={() => handleLogoutClick()}
+							>
+								Keluar
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
 				</Menu.Menu>
 			</>
 		);

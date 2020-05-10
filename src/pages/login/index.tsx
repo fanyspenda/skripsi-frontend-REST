@@ -1,13 +1,17 @@
 import React, { useContext } from "react";
-import { Segment, Card, Button } from "semantic-ui-react";
+import { Segment, Card, Button, Label } from "semantic-ui-react";
 import { useFormik } from "formik";
 import CustomInputForm from "components/CustomInputForm";
 import LoginSchema from "./loginValidation";
 import axios from "axios";
 import { TokenContext } from "contexts/tokenContext";
 import { useHistory } from "react-router";
+import UseLoading from "hooks/useLoading";
+import useError from "hooks/useError";
 
 const Login: React.FunctionComponent = () => {
+	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
+	const { error, setError } = useError();
 	const history = useHistory();
 	const { dispatch } = useContext(TokenContext);
 	const formik = useFormik({
@@ -18,16 +22,19 @@ const Login: React.FunctionComponent = () => {
 		},
 		validationSchema: LoginSchema,
 		onSubmit: (values) => {
+			setLoadingToTrue();
 			axios
 				.post("http://localhost:4000/user/login", values)
 				.then((res) => {
-					alert("login berhasil!");
 					dispatch({ type: "SAVE_TOKEN", token: res.data.token });
 					history.push("/alumni");
 					// dispatch({ type: "REMOVE_TOKEN", token: "" });
 				})
 				.catch((err) => {
-					alert(`gagal login: ${err.response.data.error}`);
+					setError(err.response.data.error);
+				})
+				.finally(() => {
+					setLoadingToFalse();
 				});
 		},
 	});
@@ -36,6 +43,11 @@ const Login: React.FunctionComponent = () => {
 			<Card centered>
 				<Segment basic>
 					<h1>LOGIN</h1>
+					{isLoading && (
+						<Label color="green">mendapatkan token...</Label>
+					)}
+					{error && !isLoading && <Label color="red">{error}</Label>}
+					<br />
 					<CustomInputForm
 						label="Email"
 						name="email"
@@ -54,7 +66,13 @@ const Login: React.FunctionComponent = () => {
 						touched={formik.touched.password}
 					/>
 				</Segment>
-				<Button type="submit" color="blue" fluid size="huge">
+				<Button
+					type="submit"
+					color="blue"
+					fluid
+					size="huge"
+					disabled={isLoading}
+				>
 					MASUK
 				</Button>
 			</Card>

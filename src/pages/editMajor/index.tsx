@@ -1,27 +1,61 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { Segment, Form, Label, Button } from "semantic-ui-react";
 import CustomInputForm from "components/CustomInputForm";
 import { editMajorValidationSchema } from "./editMajorValidation";
 import { TokenContext } from "contexts/tokenContext";
 import { useHistory, useLocation } from "react-router-dom";
+import useAuth from "hooks/useAuth";
+import axios from "axios";
+import UseLoading from "hooks/useLoading";
 
 const EditMajor: React.FunctionComponent = () => {
-	const [major, setMajor] = useState({ id: "", degree: "", name: "" });
+	const [major, setMajor] = useState({ degree: "", name: "" });
+	const { token, level, isLevelMatch } = useAuth();
+	const { isLoading, setLoadingToTrue, setLoadingToFalse } = UseLoading();
 	const location = useLocation();
 	const history = useHistory();
-	const { token } = useContext(TokenContext);
+	const editMajor = (data: any) => {
+		axios
+			.put(`http://localhost:4000/major/${location.state}`, data, {
+				headers: {
+					authorization: `bearer ${token}`,
+				},
+			})
+			.then(() => {
+				history.push("/majors");
+			})
+			.catch((error) => alert(error));
+	};
+	useEffect(() => {
+		setLoadingToTrue();
+		axios
+			.get(`http://localhost:4000/major/${location.state}`, {
+				headers: {
+					authorization: `bearer ${token}`,
+				},
+			})
+			.then((res) => {
+				const degree = res.data.name.split(" ")[0];
+				const name = res.data.name.replace(`${degree} `, "");
+				setMajor({ degree, name });
+			})
+			.catch((error) => alert(error))
+			.finally(() => setLoadingToFalse());
+	}, []);
 	const formik = useFormik({
 		enableReinitialize: true,
 		initialValues: major,
 		onSubmit: (values) => {
-			console.log(values);
+			const name = { name: `${values.degree} ${values.name}` };
+			editMajor(name);
 		},
 		validationSchema: editMajorValidationSchema,
 	});
 
 	return (
 		<Segment basic>
+			{isLevelMatch(level, 0)}
 			<h1>Edit Jurusan</h1>
 			<Form onSubmit={formik.handleSubmit}>
 				<Form.Group inline>
@@ -72,7 +106,9 @@ const EditMajor: React.FunctionComponent = () => {
 					onChange={formik.handleChange}
 					value={formik.values.name}
 				/>
-				<Button type="submit">Tambah Jurusan</Button>
+				<Button type="submit" disabled={isLoading} color="green">
+					Tambah Jurusan
+				</Button>
 			</Form>
 		</Segment>
 	);
