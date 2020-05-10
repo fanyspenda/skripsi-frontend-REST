@@ -54,11 +54,6 @@ const EditAlumni: React.FunctionComponent = () => {
 				setMajors(majorsArray);
 			});
 	};
-	useEffect(() => {
-		getMajors();
-		handleInitialValue(alumniId);
-	}, []);
-
 	const handleInitialValue = (id: string) => {
 		axios
 			.get(`http://localhost:4000/alumni/${id}`, {
@@ -75,11 +70,20 @@ const EditAlumni: React.FunctionComponent = () => {
 			});
 	};
 
+	useEffect(() => {
+		getMajors();
+		handleInitialValue(alumniId);
+	}, []);
+
 	const handleSubmit = (id: string, data: inputAlumni) => {
 		setIsDisabled(true);
 		console.log(data);
 		axios
-			.put(`http://localhost:4000/alumni/${id}`, data)
+			.put(`http://localhost:4000/alumni/${id}`, data, {
+				headers: {
+					authorization: `bearer ${token}`,
+				},
+			})
 			.then((res) => {
 				alert("Berhasil menyimpan data! \n" + res.data);
 				history.push("/alumni");
@@ -100,7 +104,7 @@ const EditAlumni: React.FunctionComponent = () => {
 	return (
 		<Segment basic>
 			{isLevelMatch(level, 0)}
-			<h1>Tambah data Alumni</h1>
+			<h1>Edit data Alumni</h1>
 			<form onSubmit={formik.handleSubmit}>
 				<CustomInputForm
 					label="Nama"
