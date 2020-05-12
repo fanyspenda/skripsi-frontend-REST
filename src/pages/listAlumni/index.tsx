@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Card, Grid, Button, Label, Segment, Divider } from "semantic-ui-react";
+import {
+	Card,
+	Grid,
+	Button,
+	Label,
+	Segment,
+	Divider,
+	Form,
+	Input,
+	Icon,
+} from "semantic-ui-react";
 import axios from "axios";
 import AlumniCard from "./alumniCard";
 import { page } from "interfaces/pageInterface";
 import CustomPagination from "components/CustomPagination";
 import useAuth from "hooks/useAuth";
 import UseLoading from "hooks/useLoading";
+import { useFormik } from "formik";
 
 interface alumniListInterface {
 	_id: string;
@@ -26,6 +37,7 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 			url: "",
 		},
 	]);
+	const [search, setSearch] = useState("");
 	const [alumniL, setAlumniL] = useState<alumniListInterface[]>([
 		{
 			_id: "",
@@ -58,12 +70,15 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 	const [totalPage, setTotalPage] = useState(0);
 	const [totalData, setTotalData] = useState(0);
 
-	const getAlumni = (page: number) => {
+	const getAlumni = (page: number, searchName?: string) => {
 		setLoadingToTrue();
 		axios
 			.get(`http://localhost:4000/alumni?page=${page}&limit=40`, {
 				headers: {
 					authorization: `bearer ${token}`,
+				},
+				params: {
+					name: searchName || "",
 				},
 			})
 			.then((res1) => {
@@ -78,12 +93,15 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 			})
 			.finally(() => setLoadingToFalse());
 	};
-	const getAlumniL = (page: number) => {
+	const getAlumniL = (page: number, searchName?: string) => {
 		setLoadingToTrue();
 		axios
 			.get(`http://localhost:4000/alumnilinkedin?page=${page}&limit=40`, {
 				headers: {
 					authorization: `bearer ${token}`,
+				},
+				params: {
+					name: searchName || "",
 				},
 			})
 			.then((res2) => {
@@ -111,12 +129,23 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 
 	const handlePageClickL = (pageClicked: number) => {
 		setCurrentPageL(pageClicked);
-		getAlumniL(pageClicked);
+		getAlumniL(pageClicked, search);
 	};
 	const handlePageClick = (pageClicked: number) => {
 		setCurrentPage(pageClicked);
-		getAlumni(pageClicked);
+		getAlumni(pageClicked, search);
 	};
+
+	const formik = useFormik({
+		initialValues: { search: "" },
+		onSubmit: ({ search }) => {
+			setSearch(search);
+			getAlumni(1, search);
+			getAlumniL(1, search);
+			setCurrentPage(1);
+			setCurrentPageL(1);
+		},
+	});
 
 	useEffect(() => {
 		getAlumni(currentPage);
@@ -125,6 +154,29 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 
 	return (
 		<>
+			<Segment basic>
+				<Form onSubmit={formik.handleSubmit}>
+					<Grid stackable textAlign="center">
+						<Grid.Row>
+							<Grid.Column width="10">
+								<Input
+									name="search"
+									onChange={formik.handleChange}
+									values={formik.values.search}
+									placeholder="cari alumni di sini..."
+									fluid
+								/>
+							</Grid.Column>
+							<Grid.Column width="2" textAlign="center">
+								<Button fluid color="green" type="submit">
+									<Icon name="search" />
+									Cari
+								</Button>
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
+				</Form>
+			</Segment>
 			<Segment basic disabled={isLoading}>
 				<Grid columns={4} stackable>
 					<Grid.Row>
