@@ -1,7 +1,7 @@
 import JwtDecode from "jwt-decode";
 import { useContext } from "react";
 import { TokenContext } from "contexts/tokenContext";
-import { useHistory } from "react-router-dom";
+import { useHistory, Redirect } from "react-router-dom";
 import { decodedToken } from "interfaces/tokenInterface";
 
 const useAuth = () => {
@@ -25,7 +25,13 @@ const useAuth = () => {
 		}
 	};
 
-	return { name, level, token, isLevelMatch };
+	const isTokenValid = () => {
+		if (!token) {
+			history.replace("/login");
+		}
+	};
+
+	return { name, level, token, isLevelMatch, isTokenValid };
 };
 
 export default useAuth;

@@ -1,20 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import RedirectToLogin from "components/RedirectToLogin";
 import {
 	Segment,
-	Card,
-	Statistic,
-	Icon,
-	Label,
 	Grid,
-	StrictStatisticProps,
 	IconProps,
 	StatisticProps,
 	Divider,
 } from "semantic-ui-react";
 import { TokenContext } from "contexts/tokenContext";
-import { isArray } from "util";
 import StatisticCard from "./StatisticCard";
+import axios from "axios";
+import useAuth from "hooks/useAuth";
 
 export interface DashboardProps {}
 
@@ -25,8 +21,15 @@ interface totalDataProps {
 	total: number;
 }
 
+const authOption = (token: string) => {
+	return {
+		headers: {
+			authorization: `bearer ${token}`,
+		},
+	};
+};
 const Dashboard: React.SFC<DashboardProps> = () => {
-	const { token } = useContext(TokenContext);
+	const { token, isTokenValid } = useAuth();
 	const [totalData, setTotalData] = useState<totalDataProps[]>([
 		{ label: "", total: 0, icon: undefined, color: undefined },
 	]);
@@ -34,12 +37,78 @@ const Dashboard: React.SFC<DashboardProps> = () => {
 		{ label: "", total: 0, icon: undefined, color: undefined },
 	]);
 
+	const getTotalData = async () => {
+		const [totalRes, workingRes, notWorkingRes] = await Promise.all([
+			axios.get(
+				"http://localhost:4000/counter/countAll",
+				authOption(token)
+			),
+			axios.get(
+				"http://localhost:4000/counter/countWorking",
+				authOption(token)
+			),
+			axios.get(
+				"http://localhost:4000/counter/countNotWorking",
+				authOption(token)
+			),
+		]);
+		setTotalData([
+			{
+				label: "Alumni Terdaftar",
+				icon: "graduation",
+				color: "blue",
+				total: totalRes.data.total,
+			},
+			{
+				label: "Sudah Bekerja",
+				icon: "suitcase",
+				color: "green",
+				total: workingRes.data.total,
+			},
+			{
+				label: "Belum Bekerja",
+				icon: "group",
+				color: "red",
+				total: notWorkingRes.data.total,
+			},
+		]);
+	};
+	const getTotalResouce = async () => {
+		const [totalRes, totalLRes] = await Promise.all([
+			axios.get(
+				"http://localhost:4000/counter/countLinkedin",
+				authOption(token)
+			),
+			axios.get(
+				"http://localhost:4000/counter/countAlumni",
+				authOption(token)
+			),
+		]);
+		setSourceData([
+			{
+				label: "Linkedin",
+				icon: "linkedin",
+				color: "orange",
+				total: totalRes.data.total,
+			},
+			{
+				label: "Input Manual",
+				icon: "edit",
+				color: "orange",
+				total: totalLRes.data.total,
+			},
+		]);
+	};
+
+	useEffect(() => {
+		isTokenValid();
+		getTotalData();
+		getTotalResouce();
+	}, []);
+
 	return (
 		<>
-			<RedirectToLogin />
-
 			<h1>Data Alumni</h1>
-
 			<Segment basic>
 				<Grid stackable textAlign="center">
 					<Grid.Row>

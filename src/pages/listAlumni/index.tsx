@@ -126,15 +126,25 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 	return (
 		<>
 			<Segment basic disabled={isLoading}>
-				<h1>Data Input Manual</h1>
-				<Label color="olive">jumlah jurusan: {totalData}</Label>
-				<Label color="olive">jumlah halaman: {totalPage}</Label>
 				<Grid columns={4} stackable>
-					{alumni.map((values, index) => (
-						<Grid.Column key={values._id}>
-							<AlumniCard alumni={values} />
+					<Grid.Row>
+						<Grid.Column width={16}>
+							<h1>Data Input Manual</h1>
+							<Label color="olive">
+								jumlah jurusan: {totalData}
+							</Label>
+							<Label color="olive">
+								jumlah halaman: {totalPage}
+							</Label>
 						</Grid.Column>
-					))}
+					</Grid.Row>
+					<Grid.Row>
+						{alumni.map((values, index) => (
+							<Grid.Column key={values._id}>
+								<AlumniCard alumni={values} />
+							</Grid.Column>
+						))}
+					</Grid.Row>
 					<Grid.Row>
 						<Grid.Column width={16} textAlign="center">
 							<CustomPagination
