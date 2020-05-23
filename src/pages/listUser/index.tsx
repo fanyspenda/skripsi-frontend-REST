@@ -66,6 +66,14 @@ const UserPage: React.FunctionComponent = () => {
 			.finally(() => setLoadingToFalse());
 	};
 
+	const handleDeleteClick = (id: string) => {
+		Axios.delete(`http://localhost:4000/user/${id}`, {
+			headers: {
+				authorization: `bearer ${token}`,
+			},
+		}).finally(() => window.location.reload(true));
+	};
+
 	useEffect(() => {
 		getInitialUser();
 	}, []);
@@ -78,7 +86,7 @@ const UserPage: React.FunctionComponent = () => {
 				<h1>Daftar Akun Pengguna</h1>
 				<Label color="olive">jumlah pengguna: {totalUser}</Label>
 				<Label color="olive">jumlah halaman: {totalpage}</Label>
-				<Table color="blue" structured columns={3} singleLine celled>
+				<Table color="blue" columns={3} stackable>
 					<Table.Header>
 						<Table.Row>
 							<Table.HeaderCell
@@ -145,9 +153,9 @@ const UserPage: React.FunctionComponent = () => {
 												color="red"
 												basic
 												fluid
-												// onClick={() =>
-												// 	handleDeleteClick(major._id)
-												// }
+												onClick={() =>
+													handleDeleteClick(user._id)
+												}
 											>
 												HAPUS
 											</Button>
