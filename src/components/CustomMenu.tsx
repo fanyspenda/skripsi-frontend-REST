@@ -44,6 +44,20 @@ const CustomMenu: React.FunctionComponent<customMenuProps> = ({ token }) => {
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
+				{level == 0 ? (
+					<Dropdown item text="Pengguna">
+						<Dropdown.Menu>
+							{level == 0 ? (
+								<Dropdown.Item as={Link} to="/addUser">
+									Tambah Pengguna
+								</Dropdown.Item>
+							) : null}
+							<Dropdown.Item as={Link} to="/users">
+								Lihat Daftar Pengguna
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+				) : null}
 				<Menu.Menu position="right">
 					<Dropdown item text={name}>
 						<Dropdown.Menu>
