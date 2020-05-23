@@ -12,6 +12,7 @@ import AddMajor from "pages/addMajor";
 import EditMajor from "pages/editMajor";
 import UserPage from "pages/listUser";
 import AddUser from "pages/addUser";
+import EditUser from "pages/editUser";
 
 export interface RoutesProps {}
 
@@ -29,6 +30,7 @@ const PageRouter: React.SFC<RoutesProps> = () => {
 			<Route exact path="/addUser" component={AddUser} />
 			<Route exact path="/editAlumni" component={EditAlumni} />
 			<Route exact path="/editMajor" component={EditMajor} />
+			<Route exact path="/editUser" component={EditUser} />
 			<Route exact path="/detailAlumni" component={DetailAlumni} />
 		</>
 	);

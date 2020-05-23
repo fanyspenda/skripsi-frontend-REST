@@ -74,6 +74,10 @@ const UserPage: React.FunctionComponent = () => {
 		}).finally(() => window.location.reload(true));
 	};
 
+	const handleEditClick = (user: userNoPass) => {
+		history.push("/editUser", user);
+	};
+
 	useEffect(() => {
 		getInitialUser();
 	}, []);
@@ -133,9 +137,21 @@ const UserPage: React.FunctionComponent = () => {
 								</Table.Cell>
 								{level == 0 && (
 									<>
-										<Table.Cell width="2">
+										<Table.Cell width="1">
 											<Button
 												color="yellow"
+												basic
+												fluid
+												onClick={() =>
+													handleEditClick(user)
+												}
+											>
+												EDIT
+											</Button>
+										</Table.Cell>
+										<Table.Cell width="1">
+											<Button
+												color="violet"
 												basic
 												fluid
 												onClick={() =>
@@ -145,10 +161,10 @@ const UserPage: React.FunctionComponent = () => {
 													)
 												}
 											>
-												EDIT
+												RESET PASSWORD
 											</Button>
 										</Table.Cell>
-										<Table.Cell width="2">
+										<Table.Cell width="1">
 											<Button
 												color="red"
 												basic
