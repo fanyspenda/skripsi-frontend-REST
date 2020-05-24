@@ -28,7 +28,7 @@ interface alumniListInterface {
 }
 
 const ListAlumni: React.FunctionComponent<{}> = () => {
-	const { token } = useAuth();
+	const { token, isTokenValid } = useAuth();
 	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
 	const [currentPageL, setCurrentPageL] = useState(1);
 	const [pagesL, setPagesL] = useState<page[]>([
@@ -148,6 +148,7 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 	});
 
 	useEffect(() => {
+		isTokenValid();
 		getAlumni(currentPage);
 		getAlumniL(currentPageL);
 	}, []);

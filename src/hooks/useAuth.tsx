@@ -18,6 +18,7 @@ const useAuth = () => {
 	}
 
 	const isLevelMatch = (input: number, required: number) => {
+		isTokenValid();
 		if (input !== required) {
 			alert("anda tidak berhak masuk sini...");
 			dispatch({ token: "", type: "REMOVE_TOKEN" });

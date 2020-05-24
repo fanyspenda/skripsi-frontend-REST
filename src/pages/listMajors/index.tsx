@@ -13,7 +13,7 @@ const MajorPage: React.FunctionComponent = () => {
 	const location: any = useLocation();
 	const previousPage = location.state?.page as number;
 	const history = useHistory();
-	const { token, level } = useAuth();
+	const { token, level, isTokenValid } = useAuth();
 	const { isLoading, setLoadingToTrue, setLoadingToFalse } = UseLoading();
 	const [currentPage, setCurrentPage] = useState(previousPage || 1);
 	const [majors, setMajors] = useState<major[]>([
@@ -68,6 +68,7 @@ const MajorPage: React.FunctionComponent = () => {
 		deleteMajor(id);
 	};
 	useEffect(() => {
+		isTokenValid();
 		getMajorData(currentPage, 20);
 	}, []);
 

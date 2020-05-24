@@ -11,7 +11,7 @@ import CustomPagination from "components/CustomPagination";
 type userNoPass = Omit<userType, "password">;
 
 const UserPage: React.FunctionComponent = () => {
-	const { isLevelMatch, level, token } = useAuth();
+	const { isLevelMatch, isTokenValid, level, token } = useAuth();
 	const history = useHistory();
 	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
 	const [users, setUsers] = useState<userNoPass[]>([
@@ -34,7 +34,7 @@ const UserPage: React.FunctionComponent = () => {
 
 	const getInitialUser = () => {
 		setLoadingToTrue();
-		Axios.get("http://localhost:4000/user?limit=2&page=1", {
+		Axios.get("http://localhost:4000/user?limit=20&page=1", {
 			headers: {
 				authorization: `bearer ${token}`,
 			},
@@ -53,7 +53,7 @@ const UserPage: React.FunctionComponent = () => {
 
 	const handlePageClick = (pageClicked: number) => {
 		setLoadingToTrue();
-		Axios.get(`http://localhost:4000/user?limit=2&page=${pageClicked}`, {
+		Axios.get(`http://localhost:4000/user?limit=20&page=${pageClicked}`, {
 			headers: {
 				authorization: `bearer ${token}`,
 			},
@@ -79,13 +79,12 @@ const UserPage: React.FunctionComponent = () => {
 	};
 
 	useEffect(() => {
+		isLevelMatch(level, 0);
 		getInitialUser();
 	}, []);
 
 	return (
 		<>
-			{isLevelMatch(level, 0)}
-
 			<Segment basic disabled={isLoading}>
 				<h1>Daftar Akun Pengguna</h1>
 				<Label color="olive">jumlah pengguna: {totalUser}</Label>
@@ -156,8 +155,11 @@ const UserPage: React.FunctionComponent = () => {
 												fluid
 												onClick={() =>
 													history.push(
-														"/editMajor",
-														user._id
+														"/editUserPass",
+														{
+															id: user._id,
+															name: user.name,
+														}
 													)
 												}
 											>

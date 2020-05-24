@@ -9,7 +9,7 @@ const RegisterSchema = yup.object().shape({
 		.string()
 		.min(8, "password Kurang Panjang")
 		.max(16, "password terlalu panjang")
-		.required("Tahun masuk harus diisi"),
+		.required("Password harus diisi"),
 	email: yup
 		.string()
 		.email("Email Tidak Valid")
