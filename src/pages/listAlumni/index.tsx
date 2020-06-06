@@ -117,14 +117,21 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 			.finally(() => setLoadingToFalse());
 	};
 	const handleLinkedinScrap = () => {
-		axios
-			.get("http://localhost:5000/scraper")
-			.then((res) => {
-				alert("Selesai Men-scrape data dari linkedIn!");
-			})
-			.catch((err) => {
-				alert(`terjadi kesalahan dalam scraper: ${err}`);
-			});
+		const result = window.confirm(
+			`Halaman akan memunculkan Chrome Webdriver. \n 
+			pastikan anda sudah menginstall Chrome Webdriver pada komputer anda. \n
+			Jangan ditutup hingga prosese selesai.`
+		);
+		if (result) {
+			axios
+				.get("http://localhost:5000/scraper")
+				.then((res) => {
+					alert("Selesai Men-scrape data dari linkedIn!");
+				})
+				.catch((err) => {
+					alert(`terjadi kesalahan dalam scraper: ${err}`);
+				});
+		}
 	};
 
 	const handlePageClickL = (pageClicked: number) => {
