@@ -4,8 +4,13 @@ import { useFormik } from "formik";
 import CustomInputForm from "components/CustomInputForm";
 import RegisterSchema from "./registerValidation";
 import axios from "axios";
+import { restUrl } from "serverUrl";
+import UseLoading from "hooks/useLoading";
+import { useHistory } from "react-router-dom";
 
 const Register: React.FunctionComponent = () => {
+	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
+	const history = useHistory();
 	const formik = useFormik({
 		initialValues: {
 			name: "",
@@ -14,20 +19,23 @@ const Register: React.FunctionComponent = () => {
 		},
 		validationSchema: RegisterSchema,
 		onSubmit: (values) => {
+			setLoadingToTrue();
 			axios
-				.post("http://localhost:4000/user/register", values)
+				.post(`${restUrl}user/register`, values)
 				.then((res) => {
 					alert("register berhasil!");
+					history.push("/login");
 				})
 				.catch((err) => {
 					alert(`gagal membuat akun: ${err}`);
-				});
+				})
+				.finally(() => setLoadingToFalse());
 		},
 	});
 	return (
 		<form onSubmit={formik.handleSubmit}>
 			<Card centered>
-				<Segment basic>
+				<Segment basic loading={isLoading}>
 					<h1>REGISTER</h1>
 					<CustomInputForm
 						label="Name"

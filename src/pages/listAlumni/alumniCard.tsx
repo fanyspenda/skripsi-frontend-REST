@@ -4,6 +4,9 @@ import { Card } from "semantic-ui-react";
 import { useHistory } from "react-router";
 import EditDeleteButton from "components/EditDeleteButton";
 import useAuth from "hooks/useAuth";
+import axios from "axios";
+import { restUrl } from "serverUrl";
+import UseLoading from "hooks/useLoading";
 
 interface alumniCardProps
 	extends Omit<alumniInterface, "entry_year" | "graduate_year" | "major"> {
@@ -17,6 +20,7 @@ interface alumniData {
 const AlumniCard: React.FunctionComponent<alumniData> = ({ alumni }) => {
 	const history = useHistory();
 	const { token, level } = useAuth();
+	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
 	const handleCardClick = (_id: string, data_source: string) => {
 		const data = {
 			_id,
@@ -29,7 +33,16 @@ const AlumniCard: React.FunctionComponent<alumniData> = ({ alumni }) => {
 	};
 
 	const handleDeleteClick = (_id: string) => {
-		console.log(`delete alumni with id ${_id}`);
+		setLoadingToTrue();
+		axios
+			.delete(`${restUrl}alumni/${_id}`, {
+				headers: {
+					authorization: `bearer ${token}`,
+				},
+			})
+			.then(() => window.location.reload(true))
+			.catch((err) => alert(err))
+			.finally(() => setLoadingToFalse());
 	};
 
 	return (
@@ -45,6 +58,7 @@ const AlumniCard: React.FunctionComponent<alumniData> = ({ alumni }) => {
 			<Card.Content extra>
 				{alumni.data_source == "manual" && level == 0 ? (
 					<EditDeleteButton
+						isDisabled={isLoading}
 						onEditClick={() => handleEditClick(alumni._id)}
 						onDeleteClick={() => handleDeleteClick(alumni._id)}
 					/>

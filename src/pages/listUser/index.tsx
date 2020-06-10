@@ -7,6 +7,7 @@ import { useHistory } from "react-router-dom";
 import Axios from "axios";
 import { page } from "interfaces/pageInterface";
 import CustomPagination from "components/CustomPagination";
+import { restUrl } from "serverUrl";
 
 type userNoPass = Omit<userType, "password">;
 
@@ -34,7 +35,7 @@ const UserPage: React.FunctionComponent = () => {
 
 	const getInitialUser = () => {
 		setLoadingToTrue();
-		Axios.get("http://localhost:4000/user?limit=20&page=1", {
+		Axios.get(`${restUrl}user?limit=20&page=1`, {
 			headers: {
 				authorization: `bearer ${token}`,
 			},
@@ -53,7 +54,7 @@ const UserPage: React.FunctionComponent = () => {
 
 	const handlePageClick = (pageClicked: number) => {
 		setLoadingToTrue();
-		Axios.get(`http://localhost:4000/user?limit=20&page=${pageClicked}`, {
+		Axios.get(`${restUrl}user?limit=20&page=${pageClicked}`, {
 			headers: {
 				authorization: `bearer ${token}`,
 			},
@@ -67,11 +68,12 @@ const UserPage: React.FunctionComponent = () => {
 	};
 
 	const handleDeleteClick = (id: string) => {
-		Axios.delete(`http://localhost:4000/user/${id}`, {
+		setLoadingToTrue();
+		Axios.delete(`${restUrl}user/${id}`, {
 			headers: {
 				authorization: `bearer ${token}`,
 			},
-		}).finally(() => window.location.reload(true));
+		}).finally(() => getInitialUser());
 	};
 
 	const handleEditClick = (user: userNoPass) => {
@@ -85,7 +87,7 @@ const UserPage: React.FunctionComponent = () => {
 
 	return (
 		<>
-			<Segment basic disabled={isLoading}>
+			<Segment basic loading={isLoading}>
 				<h1>Daftar Akun Pengguna</h1>
 				<Label color="olive">jumlah pengguna: {totalUser}</Label>
 				<Label color="olive">jumlah halaman: {totalpage}</Label>

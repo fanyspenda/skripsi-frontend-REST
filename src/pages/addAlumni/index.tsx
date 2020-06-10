@@ -7,7 +7,7 @@ import CustomDropdownForm from "../../components/CustomDropdownForm";
 import alumniInterface from "../../interfaces/alumniInterface";
 import { useHistory } from "react-router";
 import alumniSchema from "./addAlumniValidation";
-import { TokenContext } from "contexts/tokenContext";
+import { restUrl } from "serverUrl";
 import useAuth from "hooks/useAuth";
 import { major } from "interfaces/majorInterface";
 interface inputAlumni extends alumniInterface {
@@ -39,7 +39,7 @@ const AddAlumni: React.FunctionComponent = () => {
 	]);
 	const getMajors = () => {
 		axios
-			.get("http://localhost:4000/major?page=1&limit=0", {
+			.get(`${restUrl}major?page=1&limit=0`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -61,7 +61,7 @@ const AddAlumni: React.FunctionComponent = () => {
 		onSubmit: (values) => {
 			setIsDisabled(true);
 			axios
-				.post("http://localhost:4000/alumni", values, {
+				.post(`${restUrl}alumni`, values, {
 					headers: {
 						authorization: `bearer ${token}`,
 					},

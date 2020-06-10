@@ -8,6 +8,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import useAuth from "hooks/useAuth";
 import axios from "axios";
 import UseLoading from "hooks/useLoading";
+import { restUrl } from "serverUrl";
 
 const EditMajor: React.FunctionComponent = () => {
 	const [major, setMajor] = useState({ degree: "", name: "" });
@@ -16,8 +17,9 @@ const EditMajor: React.FunctionComponent = () => {
 	const location = useLocation();
 	const history = useHistory();
 	const editMajor = (data: any) => {
+		setLoadingToTrue();
 		axios
-			.put(`http://localhost:4000/major/${location.state}`, data, {
+			.put(`${restUrl}major/${location.state}`, data, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -25,12 +27,13 @@ const EditMajor: React.FunctionComponent = () => {
 			.then(() => {
 				history.push("/majors");
 			})
-			.catch((error) => alert(error));
+			.catch((error) => alert(error))
+			.finally(() => setLoadingToFalse());
 	};
 	useEffect(() => {
 		setLoadingToTrue();
 		axios
-			.get(`http://localhost:4000/major/${location.state}`, {
+			.get(`${restUrl}major/${location.state}`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -54,7 +57,7 @@ const EditMajor: React.FunctionComponent = () => {
 	});
 
 	return (
-		<Segment basic>
+		<Segment basic loading={isLoading}>
 			{isLevelMatch(level, 0)}
 			<h1>Edit Jurusan</h1>
 			<Form onSubmit={formik.handleSubmit}>

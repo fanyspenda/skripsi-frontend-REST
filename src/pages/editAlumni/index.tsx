@@ -10,6 +10,8 @@ import { useHistory, useLocation } from "react-router";
 import alumniValidationSchema from "./editAlumniValidation";
 import { major } from "interfaces/majorInterface";
 import useAuth from "hooks/useAuth";
+import { restUrl } from "serverUrl";
+import UseLoading from "hooks/useLoading";
 
 interface inputAlumni extends alumniInterface {
 	data_source: string;
@@ -23,6 +25,7 @@ interface majorDropdown {
 const EditAlumni: React.FunctionComponent = () => {
 	const location: any = useLocation();
 	const alumniId: string = location.state;
+	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
 	const history = useHistory();
 	const { token, level, isLevelMatch } = useAuth();
 	const [alumni, setAlumni] = useState<inputAlumni>({
@@ -40,8 +43,9 @@ const EditAlumni: React.FunctionComponent = () => {
 		{ text: "", value: "" },
 	]);
 	const getMajors = () => {
+		setLoadingToTrue();
 		axios
-			.get("http://localhost:4000/major?page=1&limit=0", {
+			.get(`${restUrl}major?page=1&limit=0`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -52,11 +56,12 @@ const EditAlumni: React.FunctionComponent = () => {
 					majorsArray.push({ text: values.name, value: values.name });
 				});
 				setMajors(majorsArray);
-			});
+			})
+			.finally(() => setLoadingToFalse());
 	};
 	const handleInitialValue = (id: string) => {
 		axios
-			.get(`http://localhost:4000/alumni/${id}`, {
+			.get(`${restUrl}alumni/${id}`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -79,7 +84,7 @@ const EditAlumni: React.FunctionComponent = () => {
 		setIsDisabled(true);
 		console.log(data);
 		axios
-			.put(`http://localhost:4000/alumni/${id}`, data, {
+			.put(`${restUrl}alumni/${id}`, data, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -102,7 +107,7 @@ const EditAlumni: React.FunctionComponent = () => {
 	});
 
 	return (
-		<Segment basic>
+		<Segment basic loading={isLoading}>
 			{isLevelMatch(level, 0)}
 			<h1>Edit data Alumni</h1>
 			<form onSubmit={formik.handleSubmit}>

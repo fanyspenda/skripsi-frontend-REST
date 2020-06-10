@@ -9,6 +9,7 @@ import { userType } from "interfaces/userInterface";
 import CustomDropdownForm from "components/CustomDropdownForm";
 import EditUserValidationSchema from "./editUserValidation";
 import Axios from "axios";
+import { restUrl } from "serverUrl";
 
 const role = [
 	{
@@ -36,7 +37,7 @@ const EditUser: React.FunctionComponent = () => {
 		validationSchema: EditUserValidationSchema,
 		onSubmit: (values) => {
 			setLoadingToTrue();
-			Axios.put(`http://localhost:4000/user/${user._id}`, values, {
+			Axios.put(`${restUrl}user/${user._id}`, values, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},

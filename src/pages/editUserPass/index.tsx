@@ -7,6 +7,7 @@ import { useLocation, useHistory } from "react-router-dom";
 import useAuth from "hooks/useAuth";
 import Axios from "axios";
 import UseLoading from "hooks/useLoading";
+import { restUrl } from "serverUrl";
 
 const EditUserPass: React.FunctionComponent = () => {
 	const user: any = useLocation().state;
@@ -19,7 +20,7 @@ const EditUserPass: React.FunctionComponent = () => {
 		onSubmit: (values) => {
 			setLoadingToTrue();
 			Axios.put(
-				`http://localhost:4000/user/resetPass/${user.id}`,
+				`${restUrl}user/resetPass/${user.id}`,
 				{
 					password: values.password,
 				},

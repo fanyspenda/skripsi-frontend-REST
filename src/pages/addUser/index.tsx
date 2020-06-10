@@ -8,6 +8,7 @@ import UseLoading from "hooks/useLoading";
 import useAuth from "hooks/useAuth";
 import Axios from "axios";
 import { useHistory } from "react-router-dom";
+import { restUrl } from "serverUrl";
 
 const role = [
 	{
@@ -29,7 +30,7 @@ const AddUser: React.FunctionComponent = () => {
 		validationSchema: AddUserValidationSchema,
 		onSubmit: (values) => {
 			setLoadingToTrue();
-			Axios.post("http://localhost:4000/user/register", values, {
+			Axios.post(`${restUrl}user/register`, values, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},

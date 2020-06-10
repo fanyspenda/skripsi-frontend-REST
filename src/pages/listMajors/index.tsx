@@ -8,6 +8,7 @@ import axios from "axios";
 import CustomPagination from "components/CustomPagination";
 import useAuth from "hooks/useAuth";
 import UseLoading from "hooks/useLoading";
+import { restUrl } from "serverUrl";
 
 const MajorPage: React.FunctionComponent = () => {
 	const location: any = useLocation();
@@ -28,7 +29,7 @@ const MajorPage: React.FunctionComponent = () => {
 	const getMajorData = (page: number, limit: number) => {
 		setLoadingToTrue();
 		axios
-			.get(`http://localhost:4000/major?limit=${limit}&page=${page}`, {
+			.get(`${restUrl}major?limit=${limit}&page=${page}`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -47,7 +48,7 @@ const MajorPage: React.FunctionComponent = () => {
 	const deleteMajor = (id: string) => {
 		setLoadingToTrue();
 		axios
-			.delete(`http://localhost:4000/major/${id}`, {
+			.delete(`${restUrl}major/${id}`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -59,21 +60,22 @@ const MajorPage: React.FunctionComponent = () => {
 			.catch((err) => alert(err))
 			.finally(() => setLoadingToFalse());
 	};
+	const handleDeleteClick = (id: string) => {
+		deleteMajor(id);
+	};
 
 	const handlePageClick = (pageClicked: number) => {
 		setCurrentPage(pageClicked);
 		getMajorData(pageClicked, 20);
 	};
-	const handleDeleteClick = (id: string) => {
-		deleteMajor(id);
-	};
+
 	useEffect(() => {
 		isTokenValid();
 		getMajorData(currentPage, 20);
 	}, []);
 
 	return (
-		<Segment basic disabled={isLoading}>
+		<Segment basic loading={isLoading}>
 			<h1>Jurusan Terdaftar</h1>
 			<Label color="olive">jumlah jurusan: {totalData}</Label>
 			<Label color="olive">jumlah halaman: {totalPage}</Label>

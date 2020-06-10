@@ -5,6 +5,7 @@ import { useLocation } from "react-router";
 import alumniInterface from "../../interfaces/alumniInterface";
 import axios from "axios";
 import useAuth from "hooks/useAuth";
+import { restUrl } from "serverUrl";
 
 interface DetailAlumniInterface extends alumniInterface {
 	_id: string;
@@ -35,7 +36,7 @@ const DetailAlumni: React.FunctionComponent<RouteComponentProps> = () => {
 		const alumniSource = location.data_source;
 		if (alumniSource === "manual") {
 			axios
-				.get(`http://localhost:4000/alumni/${alumniId}`, {
+				.get(`${restUrl}alumni/${alumniId}`, {
 					headers: {
 						authorization: `bearer ${token}`,
 					},
@@ -49,7 +50,7 @@ const DetailAlumni: React.FunctionComponent<RouteComponentProps> = () => {
 				});
 		} else if (alumniSource === "linkedin") {
 			axios
-				.get(`http://localhost:4000/alumniLinkedin/${alumniId}`, {
+				.get(`${restUrl}alumniLinkedin/${alumniId}`, {
 					headers: {
 						authorization: `bearer ${token}`,
 					},

@@ -11,6 +11,7 @@ import { TokenContext } from "contexts/tokenContext";
 import StatisticCard from "./StatisticCard";
 import axios from "axios";
 import useAuth from "hooks/useAuth";
+import { restUrl } from "serverUrl";
 
 export interface DashboardProps {}
 
@@ -39,18 +40,9 @@ const Dashboard: React.SFC<DashboardProps> = () => {
 
 	const getTotalData = async () => {
 		const [totalRes, workingRes, notWorkingRes] = await Promise.all([
-			axios.get(
-				"http://localhost:4000/counter/countAll",
-				authOption(token)
-			),
-			axios.get(
-				"http://localhost:4000/counter/countWorking",
-				authOption(token)
-			),
-			axios.get(
-				"http://localhost:4000/counter/countNotWorking",
-				authOption(token)
-			),
+			axios.get(`${restUrl}counter/countAll`, authOption(token)),
+			axios.get(`${restUrl}counter/countWorking`, authOption(token)),
+			axios.get(`${restUrl}counter/countNotWorking`, authOption(token)),
 		]);
 		setTotalData([
 			{
@@ -75,14 +67,8 @@ const Dashboard: React.SFC<DashboardProps> = () => {
 	};
 	const getTotalResouce = async () => {
 		const [totalRes, totalLRes] = await Promise.all([
-			axios.get(
-				"http://localhost:4000/counter/countLinkedin",
-				authOption(token)
-			),
-			axios.get(
-				"http://localhost:4000/counter/countAlumni",
-				authOption(token)
-			),
+			axios.get(`${restUrl}counter/countLinkedin`, authOption(token)),
+			axios.get(`${restUrl}counter/countAlumni`, authOption(token)),
 		]);
 		setSourceData([
 			{

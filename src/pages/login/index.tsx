@@ -8,6 +8,7 @@ import { TokenContext } from "contexts/tokenContext";
 import { useHistory } from "react-router";
 import UseLoading from "hooks/useLoading";
 import useError from "hooks/useError";
+import { restUrl } from "serverUrl";
 
 const Login: React.FunctionComponent = () => {
 	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
@@ -24,7 +25,7 @@ const Login: React.FunctionComponent = () => {
 		onSubmit: (values) => {
 			setLoadingToTrue();
 			axios
-				.post("http://localhost:4000/user/login", values)
+				.post(`${restUrl}user/login`, values)
 				.then((res) => {
 					dispatch({ type: "SAVE_TOKEN", token: res.data.token });
 					history.push("/alumni");

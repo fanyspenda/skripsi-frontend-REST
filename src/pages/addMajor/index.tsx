@@ -3,10 +3,11 @@ import { useFormik } from "formik";
 import { Segment, Form, Label, Button } from "semantic-ui-react";
 import CustomInputForm from "components/CustomInputForm";
 import { addMajorValidationScehma } from "./addMajorValidation";
-import { TokenContext } from "contexts/tokenContext";
 import { useHistory } from "react-router-dom";
 import useAuth from "hooks/useAuth";
 import axios from "axios";
+import { restUrl } from "serverUrl";
+import UseLoading from "hooks/useLoading";
 
 const initialValues = {
 	degree: "",
@@ -16,20 +17,27 @@ const initialValues = {
 const AddMajor: React.FunctionComponent = () => {
 	const history = useHistory();
 	const { token, level, isLevelMatch } = useAuth();
+	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
 
 	const addMajor = (data: any) => {
+		setLoadingToTrue();
 		axios
-			.post("http://localhost:4000/major", data, {
-				headers: {
-					authorization: `bearer ${token}`,
-				},
-			})
+			.post(
+				`${restUrl}major`,
+				{ name: data },
+				{
+					headers: {
+						authorization: `bearer ${token}`,
+					},
+				}
+			)
 			.then(() => {
 				history.push("/majors");
 			})
 			.catch((error) => {
 				alert(error);
-			});
+			})
+			.finally(() => setLoadingToFalse());
 	};
 	const formik = useFormik({
 		initialValues,
@@ -40,7 +48,7 @@ const AddMajor: React.FunctionComponent = () => {
 	});
 
 	return (
-		<Segment basic>
+		<Segment basic loading={isLoading}>
 			{isLevelMatch(level, 0)}
 			<h1>Tambah Jurusan</h1>
 			<Form onSubmit={formik.handleSubmit}>

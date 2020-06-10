@@ -17,6 +17,7 @@ import CustomPagination from "components/CustomPagination";
 import useAuth from "hooks/useAuth";
 import UseLoading from "hooks/useLoading";
 import { useFormik } from "formik";
+import { restUrl, linkedinScraperUrl } from "serverUrl";
 
 interface alumniListInterface {
 	_id: string;
@@ -30,6 +31,11 @@ interface alumniListInterface {
 const ListAlumni: React.FunctionComponent<{}> = () => {
 	const { token, isTokenValid } = useAuth();
 	const { isLoading, setLoadingToFalse, setLoadingToTrue } = UseLoading();
+	const {
+		isLoading: isLoadingL,
+		setLoadingToFalse: SLoadingF,
+		setLoadingToTrue: SLoadingT,
+	} = UseLoading();
 	const [currentPageL, setCurrentPageL] = useState(1);
 	const [pagesL, setPagesL] = useState<page[]>([
 		{
@@ -73,7 +79,7 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 	const getAlumni = (page: number, searchName?: string) => {
 		setLoadingToTrue();
 		axios
-			.get(`http://localhost:4000/alumni?page=${page}&limit=40`, {
+			.get(`${restUrl}alumni?page=${page}&limit=40`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -94,9 +100,9 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 			.finally(() => setLoadingToFalse());
 	};
 	const getAlumniL = (page: number, searchName?: string) => {
-		setLoadingToTrue();
+		SLoadingT();
 		axios
-			.get(`http://localhost:4000/alumnilinkedin?page=${page}&limit=40`, {
+			.get(`${restUrl}alumnilinkedin?page=${page}&limit=40`, {
 				headers: {
 					authorization: `bearer ${token}`,
 				},
@@ -114,17 +120,17 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 				alert("gagal mengambil data alumni linkedin!");
 				console.log(err);
 			})
-			.finally(() => setLoadingToFalse());
+			.finally(() => SLoadingF());
 	};
 	const handleLinkedinScrap = () => {
 		const result = window.confirm(
 			`Halaman akan memunculkan Chrome Webdriver. \n 
 			pastikan anda sudah menginstall Chrome Webdriver pada komputer anda. \n
-			Jangan ditutup hingga prosese selesai.`
+			Jangan ditutup hingga prosese selesai!`
 		);
 		if (result) {
 			axios
-				.get("http://localhost:5000/scraper")
+				.get(`${linkedinScraperUrl}scraper`)
 				.then((res) => {
 					alert("Selesai Men-scrape data dari linkedIn!");
 				})
@@ -185,7 +191,7 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 					</Grid>
 				</Form>
 			</Segment>
-			<Segment basic disabled={isLoading}>
+			<Segment basic loading={isLoading}>
 				<Grid columns={4} stackable>
 					<Grid.Row>
 						<Grid.Column width={16}>
@@ -218,7 +224,7 @@ const ListAlumni: React.FunctionComponent<{}> = () => {
 			</Segment>
 			<Divider />
 
-			<Segment basic disabled={isLoading}>
+			<Segment basic loading={isLoadingL}>
 				<Grid columns={4} stackable>
 					<Grid.Row>
 						<Grid.Column width={8} textAlign="left">
